@@ -1,36 +1,27 @@
-## Usage
+# Obsidian-Sheets
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+An obsidian plugin that allows you to edit `.sheet` files and supports javascript formulas. 
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+## Goals
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+- [ ] source/preview modes
+- [ ] javascript formulas
+- [ ] embeding into markdown files
+- [ ] reference other sheets
+- [ ] sandboxed javascript
 
-## Available Scripts
 
-In the project directory, you can run:
+## Development Notes
 
-### `npm run dev` or `npm start`
+The spreadsheet evals javascript, which atm is not sandboxed, but will be in down the road.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+I went for the "Obsidian" approach, with a "source" and "preview"
 
-The page will reload if you make edits.<br>
+At the moment the .sheet files (just json) store just the source, however I might store the preview as well so that previewing doesn't require computing unless a value gets changed. 
 
-### `npm run build`
+### [mgmeyers/obsidian-kanban](https://github.com/mgmeyers/obsidian-kanban)
+Shows that its possible to reference other documents and get `[[]]` suggestions and embed documents into the kanban view.
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-## Deployment
-
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
-
-## This project was created with the [Solid CLI](https://solid-cli.netlify.app)
+### [cooklang/cooklang-obsidian](https://github.com/cooklang/cooklang-obsidian)
+Is a good example for source/preview modes with a custom file format.
