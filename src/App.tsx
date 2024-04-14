@@ -1,11 +1,11 @@
-import { createStore, unwrap } from "solid-js/store";
-import { For, createEffect, createSignal, onMount, type Component } from 'solid-js';
+import { createStore } from "solid-js/store";
+import { For, createEffect, onMount, type Component } from 'solid-js';
 
 type Sheet<T = string> = Array<Array<T>>
 
 const DEFAULT_SHEET = [
   ["1","2","3"],
-  ["4","5","6"]
+  ["4","5","=get(0, 1) + 4"]
 ]
 
 const Table: Component<{
@@ -85,7 +85,7 @@ const App: Component = () => {
   const UNSAFE_eval = (text: string) => {
     // things made available available inside the eval
     //@ts-ignore
-    const get = (c: number, r: number) => {
+    window.get = (c: number, r: number) => {
       const value = source[c][r]
       const number = parseInt(value)
       return Number.isNaN(number) ? value : number
