@@ -1,4 +1,4 @@
-# Obsidian-Sheets
+# [Obsidian-Sheets](https://github.com/metruzanca/sheets)
 
 ⚠️ Under development ⚠️
 
@@ -30,3 +30,7 @@ Shows that its possible to reference other documents and get `[[]]` suggestions 
 Is a good example for source/preview modes with a custom file format.
 
 ### [Running sandboxed javascript by figma](https://www.figma.com/blog/how-we-built-the-figma-plugin-system/)
+
+### Apps using Solidjs
+- [mokeyish/obsidian-enhancing-export](https://github.com/mokeyish/obsidian-enhancing-export)
+- [Canna71/obsidian-sets](https://github.com/Canna71/obsidian-sets)
