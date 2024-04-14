@@ -8,6 +8,18 @@ const DEFAULT_SHEET = [
   ["4","5","6"]
 ]
 
+function createLocalStore<T>(key: string, data: T) {
+  const localData = localStorage.getItem(key) || 'null'
+  const store = createStore(JSON.parse(localData) || data);
+
+  createEffect(() => {
+    localStorage.setItem(key, JSON.stringify(store[0]))
+  })
+
+  return store
+}
+
+
 const addColumn = (sheet: Sheet): Sheet => {
   return sheet.map(row => [...row, ""])
 }
@@ -17,11 +29,21 @@ const addRow = (sheet: Sheet): Sheet => {
 }
 
 const App: Component = () => {
-  const [sheet, setSheet] = createStore(DEFAULT_SHEET);
+  const [sheet, setSheet] = createLocalStore('sheet', DEFAULT_SHEET);
   createEffect(() => console.log('Sheet: ', JSON.stringify(sheet, null, 2)))
 
   return (
-    <div>
+    <main>
+      <div class="pb-2 *:bg-zinc-200 *:px-1">
+        <button
+          class=""
+          onClick={() => {
+          localStorage.clear();
+          location.reload()
+          }}
+          textContent="Clear localstorage"
+        />
+      </div>
       <div class="flex">
         <div class="flex flex-col">
           <table class="border-collapse border border-black">
@@ -55,7 +77,7 @@ const App: Component = () => {
           <div>&nbsp;</div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
