@@ -1,7 +1,10 @@
 # Obsidian-Sheets
 
+⚠️ Under development ⚠️
+
 An obsidian plugin that allows you to edit `.sheet` files and supports javascript formulas. 
 
+See a proof of concept of how the spreadsheet works at: https://sheets-nine.vercel.app
 
 ## Goals
 
@@ -25,3 +28,5 @@ Shows that its possible to reference other documents and get `[[]]` suggestions 
 
 ### [cooklang/cooklang-obsidian](https://github.com/cooklang/cooklang-obsidian)
 Is a good example for source/preview modes with a custom file format.
+
+### [Running sandboxed javascript by figma](https://www.figma.com/blog/how-we-built-the-figma-plugin-system/)
