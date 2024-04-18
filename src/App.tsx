@@ -1,11 +1,51 @@
 import { createStore } from "solid-js/store";
 import { For, createEffect, onMount, type Component } from 'solid-js';
 
-type Sheet<T = string> = Array<Array<T>>
+type Sheet = Array<Array<{
+  source: string
+  // TODO maybe make value optional?
+  value: string
+}>>
 
-const DEFAULT_SHEET = [
-  ["1","2","3"],
-  ["4","5","=get(0, 1) + 4"]
+const createCell = (source: string, value?: string) => ({ source, value: value || '' })
+
+
+const DEFAULT_SHEET: Sheet = [
+  [
+    { source: "hello", value: ""},
+    { source: "=get(0,0) + ', '", value: ""},
+    { source: "world", value: ""},
+    { source: "=get(0, 2) + '!'", value: ""},
+    { source: "", value: ""},
+  ],
+  [
+    { source: "=get(0,1) + get(0, 3)", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+  ],
+  [
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+  ],
+  [
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+  ],
+  [
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+    { source: "", value: ""},
+  ],
 ]
 
 const Table: Component<{
@@ -13,6 +53,7 @@ const Table: Component<{
   onUpdate?: (col: number, row: number, value: string) => void
   onAddRow?: () => void
   onAddCol?: () => void
+  mode?: 'source' | 'value'
 }> = (props) => {
   return (
     <div class="flex">
@@ -22,28 +63,35 @@ const Table: Component<{
             <For each={props.sheet} children={(el, col) => (
               <tr>
                 <For each={el} children={(item, row) => (
-                  <td
-                    class="border border-black p-2 min-h-4 min-w-16"
-                    textContent={item}
-                    contentEditable={!!props.onUpdate}
-                    onBlur={e => {
-                      props.onUpdate?.(col(), row(), e.target.textContent!)
-                    }}
-                  />
+                  <td class="relative border border-black p-2 min-h-4 min-w-16">
+                    {props.mode === 'source' && (
+                      <div class="absolute top-0 left-0 text-xs">
+                        <span>{col()},{row()}</span>
+                      </div>
+                    )}
+                    <div
+                      contentEditable={!!props.onUpdate}
+                      onBlur={e => {
+                        props.onUpdate?.(col(), row(), e.target.textContent!)
+                      }}
+                    >
+                      {item[props.mode || 'source']}
+                    </div>
+                  </td>
                 )} />
               </tr>
             )} />
           </tbody>
         </table>
-        {props.onAddRow &&
+        {/* {props.onAddRow &&
           <button
             class="bg-slate-200 hover:bg-slate-300 rounded-b"
             onClick={props.onAddRow}
             textContent='+'
           />
-        }
+        } */}
       </div>
-      {props.onAddCol && 
+      {/* {props.onAddCol && 
         <div class="flex flex-col">
           <button
             class="flex-1 bg-slate-200 hover:bg-slate-300 rounded-r"
@@ -52,7 +100,7 @@ const Table: Component<{
             />
           <div>&nbsp;</div>
         </div>
-      }
+      } */}
     </div>
   )
 }
@@ -70,26 +118,25 @@ function createLocalStore<T extends object>(key: string, data: T) {
 }
 
 const addColumn = (sheet: Sheet): Sheet => {
-  return sheet.map(row => [...row, ""])
+  return sheet.map(row => [...row, createCell('')])
 }
 
 const addRow = (sheet: Sheet): Sheet => {
-  return [...sheet, new Array(sheet[0].length).fill("")]
+  return [...sheet, new Array(sheet[0].length).fill(createCell(''))]
 }
 
 const App: Component = () => {
   const [source, setSource] = createLocalStore<Sheet>('sheet', DEFAULT_SHEET);
-  const [preview, setPreview] = createStore<Sheet>(JSON.parse(JSON.stringify(source)));
 
   // TODO make this safe and inject things like `get`
   const UNSAFE_eval = (text: string) => {
     // things made available available inside the eval
     //@ts-ignore
     window.get = (c: number, r: number) => {
-      const value = source[c][r]
-      const number = parseInt(value)
-      return Number.isNaN(number) ? value : number
-    }
+      const cell = source[c][r]
+      const number = parseInt(cell.value)
+      return Number.isNaN(number) ? cell.value : number
+    }    
     return eval(text)
   }
 
@@ -97,18 +144,18 @@ const App: Component = () => {
   // TODO make pure
   const evaluate = (col: number, row: number, content: string) => {
     if (content.startsWith('=')) {
-      const result = UNSAFE_eval(content.slice(1))
-      setPreview(col, row, result)
+      const value = UNSAFE_eval(content.slice(1))
+      setSource(col, row, 'value', value)
     } else {
-      setPreview(col, row, content)
+      setSource(col, row, 'value', content)
     }
   }
 
 
   onMount(() => {
-    for (let col = 0; col < preview.length; col++) {
-      for (let row = 0; row < preview[col].length; row++) {
-        evaluate(col, row, preview[col][row])        
+    for (let col = 0; col < source.length; col++) {
+      for (let row = 0; row < source[col].length; row++) {
+        evaluate(col, row, source[col][row].source)
       }
     }
   })
@@ -128,10 +175,11 @@ const App: Component = () => {
         <div>
           <h2>Source</h2>
           <Table
+            mode="source"
             onAddCol={() => setSource(addColumn)}
             onAddRow={() => setSource(addRow)}
             onUpdate={(c, r, value) => {
-              setSource(c, r, value)
+              setSource(c, r, 'source', value)
               evaluate(c, r, value)
             }}
             sheet={source}
@@ -141,7 +189,8 @@ const App: Component = () => {
         <div>
           <h2>Preview</h2>
           <Table
-            sheet={preview}
+            mode="value"
+            sheet={source}
           />
         </div>
       </article>
